@@ -6,6 +6,7 @@ orig = cv.LoadImage('4.jpg')
 
 #cambio
 #cambio2
+#cambio4
 # create tmp images
 rrr=cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
 ggg=cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
