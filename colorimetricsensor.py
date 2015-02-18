@@ -39,7 +39,7 @@ def moda(cuadrados):
     aux = 0
     cont = 0
     moda = -1
-    cuadrados.sort(cmp=None, key=None, reverse=False)
+    cuadrados.sort()
     print cuadrados
     for i in range(0,len(cuadrados)-1):
         if (cuadrados[i] == cuadrados[i+1]):
@@ -61,31 +61,29 @@ def modafinal (cuadrado):
     m_v = moda(vv)
     m_a = moda(va)  
 
-    vaux = [m_r,m_v,m_a]
-    return vaux    
+    
+    return m_r,m_v,m_a
 
 def dividir (imagen):
 
-    rojo = cv.CreateImage((cuadrado1.width,cuadrado1.height), cv.IPL_DEPTH_8U, 1)
-    verde = cv.CreateImage((cuadrado1.width,cuadrado1.height), cv.IPL_DEPTH_8U, 1)
-    azul= cv.CreateImage((cuadrado1.width,cuadrado1.height), cv.IPL_DEPTH_8U, 1)
-    cv.Split(cuadrado1,rojo,verde,azul,None)
+    rojo = cv.CreateImage((imagen.width,imagen.height), cv.IPL_DEPTH_8U, 1)
+    verde = cv.CreateImage((imagen.width,imagen.height), cv.IPL_DEPTH_8U, 1)
+    azul= cv.CreateImage((imagen.width,imagen.height), cv.IPL_DEPTH_8U, 1)
+    cv.Split(imagen,rojo,verde,azul,None)
     Ir = np.asarray(rojo[:,:])
     Iv = np.asarray(verde[:,:])
     Ia = np.asarray(azul[:,:])   
-    return [Ir,Iv,Ia]
+    return Ir,Iv,Ia
 
 def vectorizar (vector):
     v = []
     for i in xrange(0,len(vector[0])-1):
-        for j in xrange(0,len(vector[0])-1):        
-            aux = vector[i][j]
-            v.append(aux)
+            v.append(vector[i])
     return v
 
 
-output = cv.LoadImage('escaner-2.jpg')
-orig = cv.LoadImage('escaner-2.jpg')
+output = cv.LoadImage('sensor2.jpg')
+orig = cv.LoadImage('sensor2.jpg')
 
 # create tmp images
 rrr=cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
@@ -128,44 +126,19 @@ cv.HoughCircles(processed, storage, cv.CV_HOUGH_GRADIENT, 2, 32, 100, radiomax)
 
 cuadrados = draw_circles(storage, output)
 
+moda_rojo = []
+moda_verde = []
+moda_azul = []
+for cuadrado in cuadrados:
+    moda_rojo.append(modafinal(cuadrado))
+    moda_verde.append(modafinal(cuadrado))
+    moda_azul.append(modafinal(cuadrado))
 
-# for x in xrange(0,len(cuadrados)):
-
-cuadrado1 = cuadrados[0]
-cuadrado2 = cuadrados[1]
-cuadrado3 = cuadrados[2]
-cuadrado4 = cuadrados[3]
-
-cv.ShowImage("Display window",cuadrado4)
-# cuadrado5 = cuadrados[4]
-# cuadrado6 = cuadrados[5]
-# cuadrado7 = cuadrados[6]
-# cuadrado8 = cuadrados[7]
-# cuadrado9 = cuadrados[8]
-# cuadrado10 = cuadrados[8]
-# cuadrado11= cuadrados[9]
-# cuadrado12 = cuadrados[10]
-# cuadrado13 = cuadrados[11] 
-# cuadrado14 = cuadrados[12]
-#a = modafinal(cuadrado3)
-#r1 =  np.array(r).tolist()
-
-
-
-    
-
-
-    
-    
 
 
 
 
 
     
-     
-
-
-
 
 cv.WaitKey(0)
