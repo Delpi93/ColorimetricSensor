@@ -180,7 +180,7 @@ for cuadrado in cuadrados:
 
 
 #Obtenemos las coordenadas HSV
-#H va en º
+#H va en grados
 #S va en %
 #V va en %
 circulo_hsv = conv_HSV(circulo_rgb)
