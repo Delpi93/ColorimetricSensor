@@ -11,7 +11,6 @@ def channel_processing(channel):
 
 def draw_circles(storage, output):
     circles = np.asarray(storage)
-    print circles
     cuadrados = []
     
     for circle in circles:
@@ -20,16 +19,15 @@ def draw_circles(storage, output):
         x2 = x + Radius
         y1 = y - Radius
         y2 = y + Radius
-   
-
-        vec = [x1, x2, y1, y2] 
 
         cuadrado = output[y1:y2, x1:x2]        
         cuadrados.append(cuadrado)
        
         #cv.Circle(output, (x, y), 1, cv.CV_RGB(0, 255, 0), -1, 8, 0)
         #cv.Circle(output, (x, y), Radius, cv.CV_RGB(255, 0, 0), 3, 8, 0)
-        
+
+        #para recortar los circulos
+
         cv.ShowImage("pic{:>05}".format(circle),cuadrado)
     
     return cuadrados
@@ -77,12 +75,49 @@ def dividir (imagen):
     return Ir,Iv,Ia
 
 def vectorizar (vector):
+    
     v = []
     for i in xrange(0,len(vector[0])-1):
         for j in xrange(0,len(vector[0])-1):        
             aux = vector[i][j]
             v.append(aux)
     return v
+
+def conv_HSV (valores_rgb):
+    
+    valores_hsv = []
+    for rgb_cord in valores_rgb:
+        R_norm = rgb_cord[0] 
+        G_norm = rgb_cord[1] 
+        B_norm = rgb_cord[2] 
+        Cmax = max(R_norm,G_norm,B_norm)
+        Cmin = min(R_norm,G_norm,B_norm)
+        Delta = Cmax - Cmin
+        #Calculo de H
+        if Delta == 0 :
+            H = 0
+        if Cmax == R_norm:
+            H = 60 * (((float(G_norm) - float(B_norm)) / float(Delta)) % 6)
+        if Cmax == G_norm:
+            H = 60 * (((float(B_norm) - float(R_norm)) / float(Delta)) + 2)
+        if Cmax == B_norm:
+            H = 60 * (((float(R_norm) - float(G_norm)) / float(Delta)) + 4)
+
+        #Calculo de S
+        if Cmax == 0:
+            S = 0
+        else:
+            S = (float(Delta) / float(Cmax))*100
+
+        #Calculo de V
+        V = float(Cmax)*100/255
+
+        coordenadas = [H,S,V]
+        valores_hsv.append(coordenadas)
+
+    return valores_hsv
+        
+
 
 
 output = cv.LoadImage('blanco2.jpg')
@@ -129,26 +164,33 @@ cv.HoughCircles(processed, storage, cv.CV_HOUGH_GRADIENT, 2, 32, 100, radiomax)
 
 cuadrados = draw_circles(storage, output)
 
-
 # for x in xrange(0,len(cuadrados)):
 moda_rojo=[]
 moda_verde = []
 moda_azul = []
+circulo_rgb = []
 
 for cuadrado in cuadrados:
     aux = modafinal(cuadrado)    
     moda_rojo.append(aux[2])
     moda_verde.append(aux[1])
     moda_azul.append(aux[0])
+    v = [aux[2],aux[1],aux[0]]
+    circulo_rgb.append(v)
 
-print moda_rojo
-print moda_verde
-print moda_azul
+
+#Obtenemos las coordenadas HSV
+#H va en º
+#S va en %
+#V va en %
+circulo_hsv = conv_HSV(circulo_rgb)
+
+
 
 
 cv.ShowImage('asdf',output)
     
-#a partir de aqui es para pasar a HSV
+
 
 
 
