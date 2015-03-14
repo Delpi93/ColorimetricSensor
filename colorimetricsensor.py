@@ -3,7 +3,6 @@ import numpy as np
 
 def channel_processing(channel):
     cv.AdaptiveThreshold(channel, channel, 255, adaptive_method=cv.CV_ADAPTIVE_THRESH_MEAN_C, thresholdType=cv.CV_THRESH_BINARY, blockSize=255, param1=25)
-    #mop up the dirt
     cv.Dilate(channel, channel, None, 1)
     cv.Erode(channel, channel, None, 1)
 
@@ -23,8 +22,6 @@ def get_circles(storage, output):
 
         cut = output[yb1:yb2, xb1:xb2]        
         roi.append(cut)
-
-        #para recortar los circulos
 
         cv.ShowImage("pic{:>05}".format(circle),cut)
     
@@ -121,7 +118,7 @@ def conv_HSV (valores_rgb):
 output = cv.LoadImage('sensor4.jpg')
 orig = cv.LoadImage('sensor4.jpg')
 
-# create tmp images
+# Creamos los canales r g b
 rrr=cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
 ggg=cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
 bbb=cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
@@ -130,24 +127,20 @@ processed = cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
 
 storage = cv.CreateMat(orig.width, 1, cv.CV_32FC3)
 
-
-#split image into RGB components
-cv.Split(orig,rrr,ggg,bbb,None)
-#process each componentsolar flare
+#dividimos la imagen en canales
+cv.Split(orig,bbb,ggg,rrr,None)
+#procesamos cada canal por separado
 channel_processing(rrr)
 channel_processing(ggg)
 channel_processing(bbb)
-#combine images using logical 'And' to avoid saturation
+#volvemos a combinarlos
 cv.And(rrr, ggg, rrr)
 cv.And(rrr, bbb, processed)
-#cv.ShowImage('before canny', processed)
 
-
-#use canny, as HoughCircles seems to prefer ring like circles to filled ones.
+#Obtenemos las fronteras
 cv.Canny(processed, processed, 5, 70, 3)
-#smooth to reduce noise a bit more
+#Suavizamos
 cv.Smooth(processed, processed, cv.CV_GAUSSIAN, 7, 7)
-cv.ShowImage('processed', processed)
 
 #find circles 
 #escaner-1, escaner-2 ----> radiomax=115
