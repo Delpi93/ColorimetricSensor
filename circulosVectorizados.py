@@ -4,15 +4,14 @@ import numpy as np
 
 
 def channel_processing(channel):
-    pass
     cv.AdaptiveThreshold(channel, channel, 255, adaptive_method=cv.CV_ADAPTIVE_THRESH_MEAN_C, thresholdType=cv.CV_THRESH_BINARY, blockSize=255, param1=25)
     #mop up the dirt
     cv.Dilate(channel, channel, None, 1)
     cv.Erode(channel, channel, None, 1)
 
-def draw_circles(storage, output):
+def get_circles(storage, output):
     circles = np.asarray(storage)
-    cuadrados = []
+    roi = []
     
     for circle in circles:
         Radius, x, y = int(circle[0][2]), int(circle[0][0]), int(circle[0][1])
@@ -29,39 +28,36 @@ def draw_circles(storage, output):
         yb2 = y + b
 
 
-        cuadrado = output[yb1:yb2, xb1:xb2]        
-        cuadrados.append(cuadrado)
-       
-        #cv.Circle(output, (x, y), 1, cv.CV_RGB(0, 255, 0), -1, 8, 0)
-        #cv.Circle(output, (x, y), Radius, cv.CV_RGB(255, 0, 0), 3, 8, 0)
+        cut = output[yb1:yb2, xb1:xb2]        
+        roi.append(cut)
 
         #para recortar los circulos
 
-        cv.ShowImage("pic{:>05}".format(circle),cuadrado)
+        cv.ShowImage("pic{:>05}".format(circle),cut)
     
-    return cuadrados
+    return roi
 
-def moda(cuadrados):
+def moda(roi):
   
     
     aux = 0
     cont = 0
     moda = -1
-    cuadrados.sort(cmp=None, key=None, reverse=False)
+    roi.sort(cmp=None, key=None, reverse=False)
     
-    for i in range(0,len(cuadrados)-1):
-        if (cuadrados[i] == cuadrados[i+1]):
+    for i in range(0,len(roi)-1):
+        if (roi[i] == roi[i+1]):
             cont = cont + 1
             if cont >= aux:
                 aux = cont
-                moda = cuadrados[i]
+                moda = roi[i]
         else:
             cont=0
  
     return moda
     
-def modafinal (cuadrado):
-    r,g,b= dividir(cuadrado)
+def modafinal (roi):
+    r,g,b= dividir(roi)
     vr = vectorizar(r)
     vv = vectorizar(g)
     va = vectorizar(b)
@@ -72,12 +68,12 @@ def modafinal (cuadrado):
     vaux = [m_r,m_v,m_a]
     return vaux    
 
-def dividir (imagen):
+def dividir (roi):
 
-    rojo = cv.CreateImage((imagen.width,imagen.height), cv.IPL_DEPTH_8U, 1)
-    verde = cv.CreateImage((imagen.width,imagen.height), cv.IPL_DEPTH_8U, 1)
-    azul= cv.CreateImage((imagen.width,imagen.height), cv.IPL_DEPTH_8U, 1)
-    cv.Split(imagen,rojo,verde,azul,None)
+    rojo = cv.CreateImage((roi.width,roi.height), cv.IPL_DEPTH_8U, 1)
+    verde = cv.CreateImage((roi.width,roi.height), cv.IPL_DEPTH_8U, 1)
+    azul= cv.CreateImage((roi.width,roi.height), cv.IPL_DEPTH_8U, 1)
+    cv.Split(roi,rojo,verde,azul,None)
     Ir = np.asarray(rojo[:,:])
     Iv = np.asarray(verde[:,:])
     Ia = np.asarray(azul[:,:])   
@@ -96,21 +92,21 @@ def conv_HSV (valores_rgb):
     
     valores_hsv = []
     for rgb_cord in valores_rgb:
-        R_norm = rgb_cord[0] 
-        G_norm = rgb_cord[1] 
-        B_norm = rgb_cord[2] 
-        Cmax = max(R_norm,G_norm,B_norm)
-        Cmin = min(R_norm,G_norm,B_norm)
+        R = rgb_cord[0] 
+        G = rgb_cord[1] 
+        B = rgb_cord[2] 
+        Cmax = max(R,G,B)
+        Cmin = min(R,G,B)
         Delta = Cmax - Cmin
         #Calculo de H
         if Delta == 0 :
             H = 0
-        if Cmax == R_norm:
-            H = 60 * (((float(G_norm) - float(B_norm)) / float(Delta)) % 6)
-        if Cmax == G_norm:
-            H = 60 * (((float(B_norm) - float(R_norm)) / float(Delta)) + 2)
-        if Cmax == B_norm:
-            H = 60 * (((float(R_norm) - float(G_norm)) / float(Delta)) + 4)
+        if Cmax == R:
+            H = 60 * (((float(G) - float(B)) / float(Delta)) % 6)
+        if Cmax == G:
+            H = 60 * (((float(B) - float(R)) / float(Delta)) + 2)
+        if Cmax == B:
+            H = 60 * (((float(R) - float(G)) / float(Delta)) + 4)
 
         #Calculo de S
         if Cmax == 0:
@@ -175,16 +171,15 @@ radiomax=220
 cv.HoughCircles(processed, storage, cv.CV_HOUGH_GRADIENT, 2, 32, 100, radiomax)
 
 
-cuadrados = draw_circles(storage, output)
+rois = get_circles(storage, output)
 
-# for x in xrange(0,len(cuadrados)):
 moda_rojo=[]
 moda_verde = []
 moda_azul = []
 circulo_rgb = []
 
-for cuadrado in cuadrados:
-    aux = modafinal(cuadrado)    
+for roi in rois:
+    aux = modafinal(roi)    
     moda_rojo.append(aux[2])
     moda_verde.append(aux[1])
     moda_azul.append(aux[0])
@@ -200,19 +195,6 @@ circulo_hsv = conv_HSV(circulo_rgb)
 print circulo_rgb
 #print circulo_hsv
 
-
-
 cv.ShowImage('asdf',output)
     
-
-
-
-
-
-    
-     
-
-
-
-
 cv.WaitKey(0)
