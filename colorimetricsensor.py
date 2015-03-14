@@ -13,11 +13,6 @@ def get_circles(storage, output):
     
     for circle in circles:
         Radius, x, y = int(circle[0][2]), int(circle[0][0]), int(circle[0][1])
-        # x1 = x - Radius
-        # x2 = x + Radius
-        # y1 = y - Radius
-        # y2 = y + Radius
-
         # con relaciones trigonometricas sacamos el cuadrado inscrito en el circulo suponemos que el angulo es de 45 grados
         b = int(Radius * 0.7071)
         xb1 = x - b
