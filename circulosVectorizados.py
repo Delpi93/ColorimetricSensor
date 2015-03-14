@@ -4,7 +4,7 @@ import numpy as np
 
 def channel_processing(channel):
     pass
-    cv.AdaptiveThreshold(channel, channel, 255, adaptive_method=cv.CV_ADAPTIVE_THRESH_MEAN_C, thresholdType=cv.CV_THRESH_BINARY, blockSize=255, param1=15)
+    cv.AdaptiveThreshold(channel, channel, 255, adaptive_method=cv.CV_ADAPTIVE_THRESH_MEAN_C, thresholdType=cv.CV_THRESH_BINARY, blockSize=255, param1=25)
     #mop up the dirt
     cv.Dilate(channel, channel, None, 1)
     cv.Erode(channel, channel, None, 1)
@@ -120,8 +120,8 @@ def conv_HSV (valores_rgb):
 
 
 
-output = cv.LoadImage('blanco2.jpg')
-orig = cv.LoadImage('blanco2.jpg')
+output = cv.LoadImage('sensor2.jpg')
+orig = cv.LoadImage('sensor2.jpg')
 
 # create tmp images
 rrr=cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
@@ -157,8 +157,11 @@ cv.ShowImage('processed', processed)
 #3,4 ---------------------> radiomax=301
 #1,2 ---------------------> radiomax=150
 #sensor6.jpg--------------> radiomax=130
+#para blanco 2 -----------> radiomax=250 (el param1 del umbral es 15)
+#para morado -----------> radiomax= 135   (el param1 del umbral es 25)
+#para sensor2 -----------> radiomax= 200   (el param1 del umbral es 25)
 
-radiomax=250
+radiomax=200
 cv.HoughCircles(processed, storage, cv.CV_HOUGH_GRADIENT, 2, 32, 100, radiomax)
 
 
@@ -184,7 +187,8 @@ for cuadrado in cuadrados:
 #S va en %
 #V va en %
 circulo_hsv = conv_HSV(circulo_rgb)
-
+print circulo_rgb
+print circulo_hsv
 
 
 
