@@ -2,6 +2,7 @@ import cv
 import numpy as np
 
 
+
 def channel_processing(channel):
     pass
     cv.AdaptiveThreshold(channel, channel, 255, adaptive_method=cv.CV_ADAPTIVE_THRESH_MEAN_C, thresholdType=cv.CV_THRESH_BINARY, blockSize=255, param1=25)
@@ -15,12 +16,20 @@ def draw_circles(storage, output):
     
     for circle in circles:
         Radius, x, y = int(circle[0][2]), int(circle[0][0]), int(circle[0][1])
-        x1 = x - Radius
-        x2 = x + Radius
-        y1 = y - Radius
-        y2 = y + Radius
+        # x1 = x - Radius
+        # x2 = x + Radius
+        # y1 = y - Radius
+        # y2 = y + Radius
 
-        cuadrado = output[y1:y2, x1:x2]        
+        # con relaciones trigonometricas sacamos el cuadrado inscrito en el circulo suponemos que el angulo es de 45 grados
+        b = int(Radius * 0.7071)
+        xb1 = x - b
+        xb2 = x + b
+        yb1 = y - b
+        yb2 = y + b
+
+
+        cuadrado = output[yb1:yb2, xb1:xb2]        
         cuadrados.append(cuadrado)
        
         #cv.Circle(output, (x, y), 1, cv.CV_RGB(0, 255, 0), -1, 8, 0)
@@ -120,8 +129,8 @@ def conv_HSV (valores_rgb):
 
 
 
-output = cv.LoadImage('sensor2.jpg')
-orig = cv.LoadImage('sensor2.jpg')
+output = cv.LoadImage('sensor4.jpg')
+orig = cv.LoadImage('sensor4.jpg')
 
 # create tmp images
 rrr=cv.CreateImage((orig.width,orig.height), cv.IPL_DEPTH_8U, 1)
@@ -160,8 +169,9 @@ cv.ShowImage('processed', processed)
 #para blanco 2 -----------> radiomax=250 (el param1 del umbral es 15)
 #para morado -----------> radiomax= 135   (el param1 del umbral es 25)
 #para sensor2 -----------> radiomax= 200   (el param1 del umbral es 25)
+#para sensor2 -----------> radiomax= 220  (el param1 del umbral es 25)
 
-radiomax=200
+radiomax=220
 cv.HoughCircles(processed, storage, cv.CV_HOUGH_GRADIENT, 2, 32, 100, radiomax)
 
 
@@ -188,7 +198,7 @@ for cuadrado in cuadrados:
 #V va en %
 circulo_hsv = conv_HSV(circulo_rgb)
 print circulo_rgb
-print circulo_hsv
+#print circulo_hsv
 
 
 
